@@ -226,7 +226,7 @@ If lr_scheduler can't correct this, then you may take the following measures:
 - If your dataset is smaller than 10000 images, you should crawl more images. Such a small dataset will cause the model
 to overfit easily.
 - You may decrease the initial lr by editing `nn_train.py`.
-- You may consider replace Adam optimizer with SGD optimizer, for SGD optimizer usually has better generalization 
+- You may consider replacing Adam optimizer with SGD optimizer, for SGD optimizer usually has better generalization 
 performance than Adam optimizer. Don't forget to adjust lr accordingly (SGD usually needs a higher lr to converge faster).
 
 ### Model doesn't converge

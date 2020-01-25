@@ -1,6 +1,6 @@
 # Jaccount Captcha Solver
 
-High accuracy captcha resolver for SJTU Jaccount login page using SVM and ResNet.
+High accuracy captcha solver for SJTU Jaccount login page using SVM and ResNet.
 
 ![captcha example](screenshots/captcha.jpg)
 
