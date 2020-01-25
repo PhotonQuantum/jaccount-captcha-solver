@@ -186,7 +186,7 @@ And you may calculate the accuracy. In this case:
 ## Overfit
 
 It's common for models using Adam optimizer to slightly overfit, 
-so don't be panic if you see difference between train accuracy and test accuracy. 
+so don't panic if you see difference between train accuracy and test accuracy. 
 
 For example, if you see something like:
 
@@ -217,7 +217,7 @@ Test Acc: [Sentence] 0.000000 [Char] 13.667847
 
 Unfortunately, there may be a serious overfitting.
 
-But don't be panic, you may just wait for lr_scheduler to kick in to correct it. Sometimes the loss increasement will trigger a lr decay 
+But don't panic, you may just wait for lr_scheduler to kick in to correct it. Sometimes the loss increasement will trigger a lr decay 
 and solve the problem. Your test accuracy will increase gradually.
 
 If lr_scheduler can't correct this, then you may take the following measures:
