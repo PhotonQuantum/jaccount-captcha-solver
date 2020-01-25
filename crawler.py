@@ -19,7 +19,7 @@ WORKERS = 9
 # Modify this to fetch more/less images
 FETCH_COUNT = 1000
 # Modify this to change recognize mode
-REC_MODE = 2  # 0: tesseract 1: svm 2: resnet
+REC_MODE = 0  # 0: tesseract 1: svm 2: resnet
 # Modify this to change working mode
 #
 # 0: dataset preparing (fetch captcha from jaccount, label them by using existing
@@ -27,7 +27,7 @@ REC_MODE = 2  # 0: tesseract 1: svm 2: resnet
 #
 # 1: benchmark (just test the model and don't save any file.)
 #
-WORK_MODE = 1
+WORK_MODE = 0
 
 LOGIN_URL = "https://i.sjtu.edu.cn/jaccountlogin"
 LOGIN_POST_URL = "https://jaccount.sjtu.edu.cn/jaccount/ulogin"
