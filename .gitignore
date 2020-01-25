@@ -134,3 +134,6 @@ segmented/
 labelled/
 unlabelled/
 checkpoint/
+model.pickle
+ckpt.pth
+dataset.zip
