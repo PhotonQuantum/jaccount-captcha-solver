@@ -47,13 +47,13 @@ Then you may install required packages.
 $ pip install -r requirements.txt
 ```
 
-Be aware that `torchvision == 0.2.2` has a known compatibility issue with `Pillow >= 7.0.0`. If you met with problems when importing `torchvision`, you may work it around by applying the given patch.
-
-```shell script
-$ patch -p0 -d .venv/lib/python* < torchvision.patch
-```
-
 Now you are ready to go!
+
+> For Archlinux users: 
+>
+> Currently it's recommended to install pyenv to manage your python version and freeze your python version to 3.7.
+>
+> Several packages this project depends on doesn't provide py38 wheels for now.
 
 *For instructions on fetching a dataset, training your model, and benchmarking it, please refer to [USAGE.md](USAGE.md) for more information.*
 
