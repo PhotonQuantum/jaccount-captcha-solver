@@ -1,8 +1,12 @@
-httpx~=0.11.1
-matplotlib~=3.1.2
-opencv-python~=4.1.2.30
-Pillow~=7.0.0
-pytesseract~=0.3.1
+httpx>=0.11.1
+matplotlib
+opencv-python>=4.0
+Pillow>=7.0.0
+pytesseract
 scikit-learn~=0.22.1
 torch~=1.4.0
 torchvision~=0.2.2.post3
+onnx>=1.6.0
+onnxruntime>=1.1.1
+skl2onnx>=1.6.0
+

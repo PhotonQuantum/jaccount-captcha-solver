@@ -145,11 +145,53 @@ Sometimes you may want to terminate the script in advance (for the current accur
 you may get the trainned model from `checkpoint` directory. 
 The file name pattern is `ckpt_<epoch>_acc_<test_accuracy>.pth`
 
+# Convert your model into ONNX file
+
+ONNX is an open format built to represent machine learning models. By compiling your model into ONNX file,
+you can score your model with different backends.
+
+## SVM
+
+The converter provided assumes that your model accepts an array of shape([400]).
+
+To convert your SVM model into ONNX file:
+
+```shell script
+$ python svm_converter.py model.pickle svm_model.onnx
+Loading model...
+Validating model... Pass.
+Optimizing model...
+Finished.
+```
+
+## Neural network
+
+The converter provided assumes an input of shape([1, 1, 40, 100]).
+
+To convert your NN model into ONNX file:
+
+```shell script
+$ python nn_converter.py ckpt.pth nn_model.onnx
+Loading model...
+Tracing model...
+Validating model... Pass.
+Optimizing model...
+Finished.
+```
+
+> Note:
+>
+> Any network accepts an input of shape([1, 1, 40, 100]) can be converted.
+>
+> You may feed in your own NN models (CNN, RNN, or anything you'd like to use).
+
 # Benchmarking
 
 You may want to benchmark your trained model using `crawler.py`.
 
 Don't forget to adjust the `WORK_MODE` flag to 1 and `REC_MODE` to the model you want to benchmark on.
+
+Also if you want to test your converted ONNX model, set `MODEL_TYPE` to 1.
 
 For example:
 
@@ -183,7 +225,9 @@ And you may calculate the accuracy. In this case:
 
 # Troubleshooting
 
-## Overfit
+## NN related
+
+### Overfit
 
 It's common for models using Adam optimizer to slightly overfit, 
 so don't panic if you see difference between train accuracy and test accuracy. 
@@ -201,7 +245,7 @@ Or your test accuracy drops from 90%+ to 70%+.
 
 Be relax. It will be corrected by the network or lr_scheduler.
 
-## Serious overfit
+### Serious overfit
 
 However, if you see test accuracy drop dramatically, for example:
 
@@ -234,3 +278,23 @@ performance than Adam optimizer. Don't forget to adjust lr accordingly (SGD usua
 It's rare for such a small model on this dataset to fail. If it fails to converge, please make sure your dataset is 
 reasonable. Check for any label error and make sure images look right. Crawling more images may also solve the problem.
 
+## ONNX related
+
+### Failed to export an ONNX attribute 'onnx::Gather', since it's not constant, please try to make things (e.g., kernel size) static if possible
+
+Change python-specific dynamic operations in your model into constant ones. For example:
+
+```python
+# out = F.avg_pool2d(out, out.size()[2:])
+out = F.avg_pool2d(out, (10, 25), stride=(10, 25))
+```
+
+### Error in Node: : Attribute 'strides' is expected to have field 'ints'
+
+It seems that the exporter unexpectedly omits the value of `strides` attribute.
+Work this around by specifying the stride of your pool layer explicitly:
+
+```python
+# out = F.avg_pool2d(out, (10, 25))
+out = F.avg_pool2d(out, (10, 25), stride=(10, 25))
+```

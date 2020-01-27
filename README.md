@@ -61,23 +61,32 @@ Now you are ready to go!
 
 ### pysjtu
 
-Just take the `model.pickle` or `ckpt.pth`, and load them:
+You need to compile your model into ONNX format if you haven't done so yet. For instructions, see [USAGE.md](usage.md).
+
+NNRecognizer feeds the whole captcha image into your model.
+Any model with an input of `[1, 1, *, *]` and an output of `[tensor[26], tensor[26], tensor[26], tensor[26], tensor[27]]` is accepted by `NNRecognizer`.
+
+LegacyRecognizer feeds segmented images (each contains only one character) into your model. Any model with an input of `[*, *]` and an output of `[str, ...]` is accepted by `LegacyRecognizer`.
 
 ```python
-from pysjtu import SVMRecognizer, NNRecognizer, Session
-svm_ocr = SVMRecognizer(model_file="your_model.pickle")
-resnet_ocr = NNRecognizer(model_file="your_checkpoint.pth")
+from pysjtu import LegacyRecognizer, NNRecognizer, Session
+svm_ocr = LegacyRecognizer(model_file="svm_model.onnx")
+nn_ocr = NNRecognizer(model_file="nn_model.onnx")
 
-session = Session(ocr=svm_ocr)  # or Session(ocr=resnet_ocr)
+session = Session(ocr=svm_ocr)  # or Session(ocr=nn_ocr)
 ```
 
 ### Other
 
-You may integrate `ocr.py` and `utils.py` into your project:
+`ocr_legacy.py` provides `SVMRecognizer` and `NNRecognizer`. Either of them accepts raw models. It depends on `nn_models.py` and `utils.py`.
+
+`ocr.py` provides `LegacyRecognizer` and `NNRecognizer`. Either of them accepts ONNX models. It depends on `utils.py`.
+
+You may integrate them into your project:
 
 ```python
 >>> import PIL from Image
->>> from ocr import NNRecognizer
+>>> from ocr_legacy import NNRecognizer
 >>> recognizer = NNRecognizer(model_file="ckpt.pth")
 >>> img = Image.open("captcha.jpg")
 >>> recognizer.recognize(img)

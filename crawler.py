@@ -12,7 +12,8 @@ import httpx
 import pytesseract
 from PIL import Image
 
-from ocr import SVMRecognizer, NNRecognizer
+import ocr
+import ocr_legacy
 
 # Modify this to change worker count
 WORKERS = 9
@@ -20,6 +21,8 @@ WORKERS = 9
 FETCH_COUNT = 1000
 # Modify this to change recognize mode
 REC_MODE = 0  # 0: tesseract 1: svm 2: resnet
+# Select ONNX to test your converted model
+MODEL_TYPE = 0  # 0: raw 1: onnx
 # Modify this to change working mode
 #
 # 0: dataset preparing (fetch captcha from jaccount, label them by using existing
@@ -84,9 +87,15 @@ def fetch_thread(queue: SimpleQueue, rtn_queue: SimpleQueue):
     if REC_MODE == 0:
         recognizer = None
     elif REC_MODE == 1:
-        recognizer = SVMRecognizer()
+        if MODEL_TYPE == 0:
+            recognizer = ocr_legacy.SVMRecognizer()
+        else:
+            recognizer = ocr.LegacyRecognizer()
     else:
-        recognizer = NNRecognizer()
+        if MODEL_TYPE == 0:
+            recognizer = ocr_legacy.NNRecognizer()
+        else:
+            recognizer = ocr.NNRecognizer()
     while True:
         # get the task
         i = queue.get()
