@@ -3,6 +3,7 @@
 High accuracy captcha solver for SJTU Jaccount login page using SVM and ResNet.
 
 ![captcha example](screenshots/captcha.jpg)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FPhotonQuantum%2Fjaccount-captcha-solver.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FPhotonQuantum%2Fjaccount-captcha-solver?ref=badge_shield)
 
 This work includes two high performance recognizers.
 
@@ -107,6 +108,9 @@ gbmke
 ## License
 
 This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FPhotonQuantum%2Fjaccount-captcha-solver.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FPhotonQuantum%2Fjaccount-captcha-solver?ref=badge_large)
 
 ## Acknowledgments
 
