@@ -92,11 +92,7 @@ class ResNet(nn.Module):
         self.layer1 = self._make_layer(block, self.in_planes, num_blocks[0], stride=1)
         self.layer2 = self._make_layer(block, self.in_planes * 2, num_blocks[1], stride=2)
         self.layer3 = self._make_layer(block, self.in_planes * 2, num_blocks[2], stride=2)
-        self.linear1 = nn.Linear(self.in_planes, 26)
-        self.linear2 = nn.Linear(self.in_planes, 26)
-        self.linear3 = nn.Linear(self.in_planes, 26)
-        self.linear4 = nn.Linear(self.in_planes, 26)
-        self.linear5 = nn.Linear(self.in_planes, 27)
+        self.linear = nn.Linear(self.in_planes, 26 * 4 + 27)
 
         self.apply(_weights_init)
 
@@ -117,14 +113,19 @@ class ResNet(nn.Module):
         # out = F.avg_pool2d(out, out.size()[2:])
         out = F.avg_pool2d(out, (10, 25), stride=(10, 25))
         out = out.view(out.size(0), -1)
-        out1 = self.linear1(out)
-        out2 = self.linear2(out)
-        out3 = self.linear3(out)
-        out4 = self.linear4(out)
-        out5 = self.linear5(out)
+        out = self.linear(out)
+        out1 = out[..., 0: 26]
+        out2 = out[..., 26: 26 * 2]
+        out3 = out[..., 26 * 2: 26 * 3]
+        out4 = out[..., 26 * 3: 26 * 4]
+        out5 = out[..., 26 * 4: 26 * 4 + 27]
 
         return out1, out2, out3, out4, out5
 
 
 def resnet20():
     return ResNet(BasicBlock, [3, 3, 3])
+
+
+def resnet_min():
+    return ResNet(BasicBlock, [1, 1, 1])

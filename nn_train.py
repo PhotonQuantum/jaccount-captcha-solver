@@ -25,12 +25,16 @@ batch_size = 320  # You may adjust this according to your graphics memory
 
 
 class CaptchaSet(Dataset):
-    def __init__(self, root, transform):
+    def __init__(self, root, transform, use_cache=True):
         self._table = [0] * 156 + [1] * 100
         self.transform = transform
 
         self.root = root
         self.imgs = listdir(root)
+
+        self.use_cache = use_cache
+        if self.use_cache:
+            self.cache = {}
 
     @staticmethod
     def _get_label_from_fn(fn):
@@ -40,6 +44,9 @@ class CaptchaSet(Dataset):
         return labels
 
     def __getitem__(self, idx):
+        if self.use_cache and idx in self.cache:
+            return self.cache[idx]
+
         img = Image.open(path.join(self.root, self.imgs[idx])).convert("L")
         img = img.point(self._table, "1")
 
@@ -47,6 +54,9 @@ class CaptchaSet(Dataset):
 
         if self.transform:
             img = self.transform(img)
+
+        if self.use_cache:
+            self.cache[idx] = (img, label)
 
         return img, label
 
@@ -69,7 +79,7 @@ test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=True)
 print('==> Building model..')
 model = resnet20()
 if USE_CUDA:
-    model = resnet20().cuda()
+    model.cuda()  # Just like model.eval()
 
 optimizer = optim.Adam(model.parameters(), lr=lr)
 scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=3)
