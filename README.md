@@ -110,7 +110,7 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 
 ## Acknowledgments
 
-- [T.T. Tang](https://github.com/EletronicElephant) for his idea and support on training a ResNet-20 model 
+- [T.T. Tang](https://github.com/ElectronicElephant) for his idea and support on training a ResNet-20 model 
 to do end-to-end multi-task learning on captcha images.
 
 - [Yerlan Idelbayev](https://github.com/akamaster) for his ResNet implementation.
