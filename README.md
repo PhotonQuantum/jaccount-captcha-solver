@@ -61,7 +61,7 @@ Now you are ready to go!
 
 ### pysjtu
 
-You need to compile your model into ONNX format if you haven't done so yet. For instructions, see [USAGE.md](usage.md).
+You need to compile your model into ONNX format if you haven't done so yet. For instructions, see [USAGE.md](USAGE.md).
 
 NNRecognizer feeds the whole captcha image into your model.
 Any model with an input of `[1, 1, *, *]` and an output of `[tensor[26], tensor[26], tensor[26], tensor[26], tensor[27]]` is accepted by `NNRecognizer`.
