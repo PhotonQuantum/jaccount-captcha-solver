@@ -61,7 +61,7 @@ Now you are ready to go!
 
 ### pysjtu
 
-You need to compile your model into ONNX format if you haven't done so yet. For instructions, see [USAGE.md](usage.md).
+You need to compile your model into ONNX format if you haven't done so yet. For instructions, see [USAGE.md](USAGE.md).
 
 NNRecognizer feeds the whole captcha image into your model.
 Any model with an input of `[1, 1, *, *]` and an output of `[tensor[26], tensor[26], tensor[26], tensor[26], tensor[27]]` is accepted by `NNRecognizer`.
@@ -110,7 +110,7 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 
 ## Acknowledgments
 
-- [T.T. Tang](https://github.com/EletronicElephant) for his idea and support on training a ResNet-20 model 
+- [T.T. Tang](https://github.com/ElectronicElephant) for his idea and support on training a ResNet-20 model 
 to do end-to-end multi-task learning on captcha images.
 
 - [Yerlan Idelbayev](https://github.com/akamaster) for his ResNet implementation.
