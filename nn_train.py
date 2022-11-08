@@ -17,9 +17,9 @@ USE_MPS = True  # for Apple silicon devices
 TEST_FACTOR = 0.2
 # Hyper parameters
 start_epoch = 0
-end_epoch = 50
+end_epoch = 75
 lr = 0.01
-batch_size = 320  # You may adjust this according to your graphics memory
+batch_size = 640  # You may adjust this according to your graphics memory. Don't forget to adjust lr.
 
 
 # Also check CHECKPOINT SETTINGS below.
