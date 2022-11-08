@@ -10,3 +10,4 @@ onnx~=1.12.0
 onnxruntime~=1.13.1
 onnxsim~=0.4.8
 skl2onnx>=1.6.0
+tqdm~=4.64.1

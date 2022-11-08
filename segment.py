@@ -1,6 +1,9 @@
 from os import path, listdir, abort, mkdir
 from uuid import uuid4
 
+import PIL
+from tqdm import tqdm
+
 from utils import *
 
 LABELLED_DIR = path.join(path.dirname(path.abspath(__file__)), 'labelled')
@@ -14,8 +17,13 @@ if not path.exists(SEGMENTED_DIR):
 def main():
     succ = 0
     fail = 0
-    for file in listdir(LABELLED_DIR):
-        img = Image.open(path.join(LABELLED_DIR, file))
+    for file in tqdm(listdir(LABELLED_DIR)):
+        try:
+            img = Image.open(path.join(LABELLED_DIR, file))
+        except PIL.UnidentifiedImageError:
+            print(f"Failed to open {file}")
+            fail += 1
+            continue
 
         img = img.convert("L")
         table = [0] * 156 + [1] * 100
