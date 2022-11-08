@@ -12,7 +12,8 @@ from torch.utils.data import Dataset, random_split, DataLoader
 from nn_models import resnet20
 
 # Train config
-USE_CUDA = True
+USE_CUDA = False
+USE_MPS = True  # for Apple silicon devices
 TEST_FACTOR = 0.2
 # Hyper parameters
 start_epoch = 0
@@ -54,6 +55,20 @@ class CaptchaSet(Dataset):
         return len(self.imgs)
 
 
+mps_device = None
+if USE_MPS:
+    mps_device = torch.device("mps")
+
+
+def transfer_to_device(x):
+    if USE_CUDA:
+        return x.cuda()
+    elif mps_device is not None:
+        return x.to(mps_device)
+    else:
+        return x
+
+
 # Data pre-processing
 print('==> Preparing data..')
 transform = transforms.ToTensor()
@@ -68,14 +83,12 @@ test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=True)
 # Model
 print('==> Building model..')
 model = resnet20()
-if USE_CUDA:
-    model = resnet20().cuda()
+model = transfer_to_device(model)
 
 optimizer = optim.Adam(model.parameters(), lr=lr)
 scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=3)
 criterion = nn.CrossEntropyLoss()
-if USE_CUDA:
-    criterion = criterion.cuda()
+criterion = transfer_to_device(criterion)
 
 # CHECKPOINT SETTINGS
 # If you want to restore training (instead of training from beginning),
@@ -110,16 +123,13 @@ def train(epoch):
     per_char_correct = 0
     per_char_total = 0
     for batch_idx, (inputs, targets) in enumerate(train_loader):
+        inputs = transfer_to_device(inputs)
 
         # Learn and predict
         optimizer.zero_grad()
-        if USE_CUDA:
-            outputs = model(inputs.cuda())
-        else:
-            outputs = model(inputs)
+        outputs = model(inputs)
 
-        if USE_CUDA:
-            targets = [target.cuda() for target in targets]
+        targets = [transfer_to_device(target) for target in targets]
 
         # Calculate loss
         losses = []
@@ -164,14 +174,11 @@ def test(epoch):
         #       Just get the outputs and count the correct predictions.
         #       You can turn to `train` function for help.
         for batch_idx, (inputs, targets) in enumerate(test_loader):
-            if USE_CUDA:
-                targets = [target.cuda() for target in targets]
+            inputs = transfer_to_device(inputs)
+            targets = [transfer_to_device(target) for target in targets]
 
             # Predict
-            if USE_CUDA:
-                outputs = model(inputs.cuda())
-            else:
-                outputs = model(inputs)
+            outputs = model(inputs)
 
             # Calculate accuracy (sentence-based and char-based)
             predicted = torch.stack([tensor.max(1)[1] for tensor in outputs], 1)
