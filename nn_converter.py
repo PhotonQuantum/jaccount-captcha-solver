@@ -16,7 +16,7 @@ def main(input_file: str, output_file: str):
 
     with NamedTemporaryFile() as temp_file:
         print("Tracing model...")
-        input_array = torch.ones(1, 1, 40, 100)
+        input_array = torch.ones(1, 1, 40, 110)
         torch.onnx.export(model, input_array, temp_file, keep_initializers_as_inputs=True)
         temp_file.seek(0)
 
