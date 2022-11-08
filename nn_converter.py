@@ -5,7 +5,7 @@ from tempfile import NamedTemporaryFile
 def main(input_file: str, output_file: str):
     import onnx
     import torch.onnx
-    from onnx import optimizer
+    from onnxsim import simplify
     from nn_models import resnet20
 
     print("Loading model...")
@@ -26,8 +26,8 @@ def main(input_file: str, output_file: str):
         print("Pass.")
 
     print("Optimizing model...")
-    passes = ["extract_constant_to_initializer", "eliminate_unused_initializer"]
-    optimized_model = optimizer.optimize(onnx_model, passes)
+    optimized_model, check = simplify(onnx_model)
+    assert check, "Simplified ONNX model could not be validated"
 
     onnx.save(optimized_model, output_file)
 
