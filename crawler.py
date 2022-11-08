@@ -53,8 +53,8 @@ def recognize_captcha(captcha_img):
     img = img.convert("L")
     table = [0] * 156 + [1] * 100
     img = img.point(table, '1')
-    return pytesseract.image_to_string(img, config="-c tessedit_char_whitelist=abcdefghijklmnopqrstuvwxyz --psm 7")
-
+    result = pytesseract.image_to_string(img, config="-c tessedit_char_whitelist=abcdefghijklmnopqrstuvwxyz --psm 7")
+    return result.strip()
 
 def login(client, username, password, recognizer=None):
     ''' a slightly modified login function from pysjtu '''
@@ -73,7 +73,7 @@ def login(client, username, password, recognizer=None):
 
     login_params.update({"v": "", "uuid": uuid, "user": username, "pass": password, "captcha": captcha})
     result = client.post(LOGIN_POST_URL, params=login_params, headers=HEADERS)
-    if "wrong username or password" in result.text:
+    if "Wrong username or password" in result.text:
         return captcha, captcha_img
     else:
         return None, captcha_img
