@@ -4,20 +4,19 @@ from tempfile import NamedTemporaryFile
 
 def main(input_file: str, output_file: str):
     import onnx
-    import torch.onnx
+    import torch
     from onnxsim import simplify
-    from nn_models import resnet20
+    from nn_models import resnet20, PLWrapper
 
     print("Loading model...")
-    model = resnet20()
     cpu = torch.device("cpu")
-    checkpoint = torch.load(input_file, map_location=cpu)
-    model.load_state_dict(checkpoint["net"])
+    model = PLWrapper(resnet20(), -1)
+    model.load_from_checkpoint(input_file, map_location=cpu)
 
     with NamedTemporaryFile() as temp_file:
         print("Tracing model...")
         input_array = torch.ones(1, 1, 40, 110)
-        torch.onnx.export(model, input_array, temp_file, keep_initializers_as_inputs=True)
+        model.to_onnx(temp_file, input_sample=input_array, keep_initializers_as_inputs=True)
         temp_file.seek(0)
 
         print("Validating model... ", end="")
