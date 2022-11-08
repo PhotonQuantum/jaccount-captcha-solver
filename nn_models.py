@@ -26,14 +26,9 @@ Reference:
 If you use this implementation in you work, please don't forget to mention the
 author, Yerlan Idelbayev.
 '''
-from typing import Dict, Union, Optional
-
-import pytorch_lightning as pl
-import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.nn.init as init
-from torch import optim
 
 
 def _weights_init(m):
@@ -129,142 +124,6 @@ class ResNet(nn.Module):
         out5 = self.linear5(out)
 
         return out1, out2, out3, out4, out5
-
-
-class Metrics:
-    def __init__(self):
-        self.correct = 0
-        self.total = 0
-        self.per_char_total = 0
-        self.per_char_correct = 0
-
-    def update(self, pred, target):
-        predicted = torch.stack([tensor.max(1)[1] for tensor in pred], 1)
-        targets_stacked = torch.stack(target, 1)
-        self.total += target[0].size(0)
-        self.correct += torch.all(predicted.eq(targets_stacked), 1).sum().item()
-        self.per_char_total += target[0].size(0) * 5
-        self.per_char_correct += predicted.eq(targets_stacked).sum().item()
-
-    def reset(self):
-        self.correct = 0
-        self.total = 0
-        self.per_char_total = 0
-        self.per_char_correct = 0
-
-    def accuracy(self):
-        return self.correct / self.total
-
-    def char_accuracy(self):
-        return self.per_char_correct / self.per_char_total
-
-    def log_dict(self, prefix=""):
-        return {
-            f"{prefix}acc": 100. * self.accuracy(),
-            f"{prefix}correct": 1. * self.correct,
-            f"{prefix}total": 1. * self.total,
-            f"{prefix}char_acc": 100. * self.char_accuracy(),
-            f"{prefix}char_correct": 1. * self.per_char_correct,
-            f"{prefix}char_total": 1. * self.per_char_total
-        }
-
-    def log_str(self):
-        return f"[S]{100. * self.accuracy():.2f}%[{self.correct}/{self.total}] [C]{100. * self.char_accuracy():.2f}%[{self.per_char_correct}/{self.per_char_total}]"
-
-    @staticmethod
-    def from_dict(d: Dict, prefix="", pop=True) -> Optional["Metrics"]:
-        if f"{prefix}acc" not in d:
-            return None
-        this = Metrics()
-        if pop:
-            d.pop(f"{prefix}acc")
-            d.pop(f"{prefix}char_acc")
-            this.correct = d.pop(f"{prefix}correct")
-            this.total = d.pop(f"{prefix}total")
-            this.per_char_correct = d.pop(f"{prefix}char_correct")
-            this.per_char_total = d.pop(f"{prefix}char_total")
-        else:
-            this.correct = d[f"{prefix}correct"]
-            this.total = d[f"{prefix}total"]
-            this.per_char_correct = d[f"{prefix}char_correct"]
-            this.per_char_total = d[f"{prefix}char_total"]
-        return this
-
-
-class PLWrapper(pl.LightningModule):
-    def __init__(self, model: nn.Module, lr: float):
-        super().__init__()
-        self.save_hyperparameters("lr")
-
-        self.model = model
-        self.lr = lr
-        self.criterion = nn.CrossEntropyLoss()
-        self.val_metrics = Metrics()
-        self.train_metrics = Metrics()
-
-    def configure_optimizers(self):
-        optimizer = optim.Adam(self.model.parameters(), lr=self.lr)
-        scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=3)
-        return {
-            'optimizer': optimizer,
-            'lr_scheduler': scheduler,
-            'monitor': 'val_loss'
-        }
-
-    def training_step(self, batch, batch_idx):
-        inputs, targets = batch
-        outputs = self.model(inputs)
-
-        losses = []
-        for idx in range(len(outputs)):
-            losses.append(self.criterion(outputs[idx], targets[idx]))
-        loss = sum(losses)
-
-        # Calculate accuracy (sentence-based and char-based)
-        self.train_metrics.update(outputs, targets)
-
-        self.log("loss", loss)
-        self.log_dict(self.train_metrics.log_dict(), prog_bar=True, logger=True)
-
-        return loss
-
-    def validation_step(self, batch, batch_idx):
-        inputs, targets = batch
-        outputs = self.model(inputs)
-
-        losses = []
-        for idx in range(len(outputs)):
-            losses.append(self.criterion(outputs[idx], targets[idx]))
-        loss = sum(losses)
-
-        self.log("val_loss", loss)
-
-        # Calculate accuracy (sentence-based and char-based)
-        self.val_metrics.update(outputs, targets)
-
-    def on_train_epoch_start(self):
-        self.train_metrics.reset()
-
-    def on_validation_epoch_start(self):
-        self.val_metrics.reset()
-
-    def on_validation_epoch_end(self) -> None:
-        self.log_dict(self.val_metrics.log_dict("val_"), prog_bar=True, logger=True)
-
-
-class CustomProgressBar(pl.callbacks.RichProgressBar):
-    def get_metrics(
-            self, trainer: "pl.Trainer", pl_module: "pl.LightningModule"
-    ) -> Dict[str, Union[int, str, float, Dict[str, float]]]:
-        items = super().get_metrics(trainer, pl_module)
-        items.pop("v_num")
-        train_report = Metrics.from_dict(items)
-        val_report = Metrics.from_dict(items, prefix="val_")
-        if train_report is not None:
-            items["train"] = train_report.log_str()
-        if val_report is not None:
-            items["val"] = val_report.log_str()
-        return items
 
 
 def resnet20():
